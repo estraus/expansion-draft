@@ -5,8 +5,8 @@ import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScoreTooltip } from "@/components/ScoreTooltip";
 import { cn } from "@/lib/utils";
-import { ArrowUpDown, Target, UserCheck } from "lucide-react";
-import { useState } from "react";
+import { ArrowUpDown, Target, UserCheck, Info, FileText, Activity } from "lucide-react";
+import { useState, useMemo } from "react";
 
 interface DraftPoolTableProps {
   expansionTeamId: string;
@@ -32,6 +32,31 @@ const expansionTeams: Record<string, string> = {
   sea: "Seattle Supersonics",
   lvn: "Las Vegas Aces",
 };
+
+function RosterSynergyBar({ draftedCount }: { draftedCount: number }) {
+  const synergy = useMemo(() => {
+    // Deterministic-ish random between 40-95 based on count
+    const base = 40;
+    const range = 55;
+    const seed = (draftedCount * 7919 + 13) % 100;
+    return Math.min(95, base + Math.round((seed / 100) * range));
+  }, [draftedCount]);
+
+  const synergyColor = synergy >= 75 ? "text-score-high" : synergy >= 55 ? "text-score-mid" : "text-score-low";
+
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1.5 shrink-0">
+        <Activity className="h-3.5 w-3.5 text-accent" />
+        <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Roster Synergy</span>
+      </div>
+      <Progress value={synergy} className="h-2 flex-1 bg-secondary" />
+      <span className={cn("text-xs font-mono font-semibold whitespace-nowrap", synergyColor)}>
+        {synergy}%
+      </span>
+    </div>
+  );
+}
 
 export function DraftPoolTable({ expansionTeamId, protectedPlayers, draftedPlayers, onDraftPlayer }: DraftPoolTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>("aiScore");
@@ -123,6 +148,11 @@ export function DraftPoolTable({ expansionTeamId, protectedPlayers, draftedPlaye
           </span>
         </div>
 
+        {/* Roster Synergy Bar */}
+        {myDrafted.length > 0 && (
+          <RosterSynergyBar draftedCount={myDrafted.length} />
+        )}
+
         {/* Drafted roster chips */}
         {draftedRoster.length > 0 && (
           <div className="flex flex-wrap gap-1.5 pt-1">
@@ -150,7 +180,21 @@ export function DraftPoolTable({ expansionTeamId, protectedPlayers, draftedPlaye
               <th className="text-left p-3"><SortHeader label="Age" sortKeyName="age" /></th>
               <th className="text-left p-3"><SortHeader label="Pos" sortKeyName="position" /></th>
               <th className="text-right p-3"><SortHeader label="Contract" sortKeyName="contractValue" /></th>
-              <th className="text-center p-3"><SortHeader label="AI Score" sortKeyName="aiScore" /></th>
+              <th className="text-center p-3">
+                <div className="flex items-center justify-center gap-1">
+                  <SortHeader label="PSV" sortKeyName="aiScore" />
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3 w-3 text-muted-foreground/50 hover:text-accent cursor-help transition-colors" />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-[220px] text-[11px]">
+                        <p><strong>Projected Surplus Value</strong> — composite score (1–100) from a gradient-boosted model weighing efficiency, age, contract, and positional scarcity.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </th>
               <th className="text-center p-3">
                 <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">Draft</span>
               </th>
@@ -167,7 +211,20 @@ export function DraftPoolTable({ expansionTeamId, protectedPlayers, draftedPlaye
                 )}
               >
                 <td className="p-3">
-                  <span className="font-medium text-sm">{player.name}</span>
+                  <TooltipProvider delayDuration={300}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="font-medium text-sm cursor-help inline-flex items-center gap-1">
+                          {player.name}
+                          <FileText className="h-3 w-3 text-muted-foreground/40" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="max-w-[240px]">
+                        <p className="text-[10px] font-mono uppercase tracking-wider text-accent mb-1">Scouting TL;DR</p>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed italic">"{player.scoutingTldr}"</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </td>
                 <td className="p-3">
                   <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
