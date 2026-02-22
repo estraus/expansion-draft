@@ -7,7 +7,7 @@ export type AppMode = "protection" | "draft";
 
 const expansionTeams = [
   { id: "sea", name: "Seattle Supersonics", abbreviation: "SEA" },
-  { id: "lvn", name: "Las Vegas Aces", abbreviation: "LVN" },
+  { id: "lvn", name: "Las Vegas Spades", abbreviation: "LVN" },
 ];
 
 interface TeamSidebarProps {

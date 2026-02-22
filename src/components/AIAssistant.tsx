@@ -18,7 +18,7 @@ interface AIAssistantProps {
 
 const expansionNames: Record<string, string> = {
   sea: "Seattle Supersonics",
-  lvn: "Las Vegas Aces",
+  lvn: "Las Vegas Spades",
 };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gm-chat`;
