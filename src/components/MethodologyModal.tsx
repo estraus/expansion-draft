@@ -75,9 +75,9 @@ export function MethodologyModal() {
 
           {/* AI Score Formula */}
           <section className="space-y-4">
-            <h3 className="font-mono text-xs uppercase tracking-widest text-accent font-semibold">AI Value Score Breakdown</h3>
+            <h3 className="font-mono text-xs uppercase tracking-widest text-accent font-semibold">Projected Surplus Value (PSV) Breakdown</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Each player's AI Value Score (1–100) is computed using a composite formula that balances on-court efficiency, age trajectory, contract value, and positional scarcity:
+              Each player's PSV (1–100) is computed using a composite formula that balances on-court efficiency, age trajectory, contract value, and positional scarcity:
             </p>
             <div className="flex flex-col items-center gap-4 py-5 px-6 rounded-lg bg-secondary/60 border border-border/50">
               <KaTeX

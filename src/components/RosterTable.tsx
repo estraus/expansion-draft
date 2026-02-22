@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScoreTooltip } from "@/components/ScoreTooltip";
 import { cn } from "@/lib/utils";
-import { ArrowUpDown, Shield, AlertTriangle } from "lucide-react";
+import { ArrowUpDown, Shield, AlertTriangle, Info, FileText } from "lucide-react";
 import { useState } from "react";
 
 interface RosterTableProps {
@@ -111,7 +111,21 @@ export function RosterTable({ team, protectedPlayers, onToggleProtect }: RosterT
               <th className="text-left p-3"><SortHeader label="Age" sortKeyName="age" /></th>
               <th className="text-left p-3"><SortHeader label="Pos" sortKeyName="position" /></th>
               <th className="text-right p-3"><SortHeader label="Contract" sortKeyName="contractValue" /></th>
-              <th className="text-center p-3"><SortHeader label="AI Score" sortKeyName="aiScore" /></th>
+              <th className="text-center p-3">
+                <div className="flex items-center justify-center gap-1">
+                  <SortHeader label="PSV" sortKeyName="aiScore" />
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3 w-3 text-muted-foreground/50 hover:text-accent cursor-help transition-colors" />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-[220px] text-[11px]">
+                        <p><strong>Projected Surplus Value</strong> — composite score (1–100) from a gradient-boosted model weighing efficiency, age, contract, and positional scarcity.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </th>
               <th className="text-center p-3">
                 <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">Protect</span>
               </th>
@@ -134,9 +148,20 @@ export function RosterTable({ team, protectedPlayers, onToggleProtect }: RosterT
                     {isProtected && <Shield className="h-3.5 w-3.5 text-primary mx-auto" />}
                   </td>
                   <td className="p-3">
-                    <span className={cn("font-medium text-sm", isProtected && "text-primary")}>
-                      {player.name}
-                    </span>
+                    <TooltipProvider delayDuration={300}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className={cn("font-medium text-sm cursor-help inline-flex items-center gap-1", isProtected && "text-primary")}>
+                            {player.name}
+                            <FileText className="h-3 w-3 text-muted-foreground/40" />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="max-w-[240px]">
+                          <p className="text-[10px] font-mono uppercase tracking-wider text-accent mb-1">Scouting TL;DR</p>
+                          <p className="text-[11px] text-muted-foreground leading-relaxed italic">"{player.scoutingTldr}"</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </td>
                   <td className="p-3 font-mono text-sm text-muted-foreground">{player.age}</td>
                   <td className="p-3">

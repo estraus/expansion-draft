@@ -19,7 +19,7 @@ export function ScoreTooltip({ score, weights }: ScoreTooltipProps) {
         <div className="flex items-center gap-1.5">
           <Brain className="h-3.5 w-3.5 text-accent" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-accent font-semibold">
-            Model Explainability
+            PSV Explainability
           </span>
         </div>
         <span className="font-mono text-sm font-bold text-foreground">{score}</span>

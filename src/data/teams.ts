@@ -11,6 +11,7 @@ export interface Player {
   contractValue: number;
   aiScore: number;
   mlFeatureWeights: FeatureWeight[];
+  scoutingTldr: string;
 }
 
 export interface TeamData {
@@ -117,17 +118,62 @@ function generateFeatureWeights(name: string, age: number, contractValue: number
   ].sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
 }
 
+const scoutingSnippets: Record<string, string[]> = {
+  PG: [
+    "Elite court vision; turnover-prone under pressure",
+    "Quick first step; struggles through screens",
+    "High-IQ floor general; limited off-ball impact",
+    "Explosive in transition; inconsistent half-court playmaker",
+    "Crafty ball-handler; defensive liability in switches",
+  ],
+  SG: [
+    "Lights-out shooter; limited creation ability",
+    "Two-way wing with lockdown perimeter D",
+    "Volume scorer; shot selection can be erratic",
+    "Reliable catch-and-shoot; average athleticism",
+    "Streaky from deep; high motor on both ends",
+  ],
+  SF: [
+    "Versatile two-way forward; improving 3pt shot",
+    "Athletic slasher; free throw struggles limit ceiling",
+    "Swiss-army-knife defender; offensive role still developing",
+    "Long wingspan; elite in passing lanes",
+    "Smooth midrange game; lateral quickness declining",
+  ],
+  PF: [
+    "Floor-spacing big; rebounding effort inconsistent",
+    "Switchable defender; post-up game underdeveloped",
+    "High-energy rebounder; limited shooting range",
+    "Modern stretch-four; foul-prone in paint",
+    "Physical finisher; needs more perimeter versatility",
+  ],
+  C: [
+    "Elite rim protector; declining lateral quickness",
+    "Dominant paint presence; limited to 5-ft range",
+    "Mobile big with passing chops; fouling issues",
+    "Strong screen-setter; offense limited to lobs",
+    "Shot-blocking anchor; conditioning concerns",
+  ],
+};
+
+function generateScoutingTldr(name: string, position: string): string {
+  const seed = name.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  const snippets = scoutingSnippets[position] || scoutingSnippets["SF"];
+  return snippets[seed % snippets.length];
+}
+
 function makeTeam(
   id: string,
   name: string,
   abbr: string,
   conf: "Eastern" | "Western",
-  players: Omit<Player, "id" | "mlFeatureWeights">[]
+  players: Omit<Player, "id" | "mlFeatureWeights" | "scoutingTldr">[]
 ): TeamData {
   const fullPlayers = players.map((p, i) => ({
     ...p,
     id: `${id}-${i + 1}`,
     mlFeatureWeights: generateFeatureWeights(p.name, p.age, p.contractValue, p.aiScore, p.position),
+    scoutingTldr: generateScoutingTldr(p.name, p.position),
   }));
   return {
     id,
