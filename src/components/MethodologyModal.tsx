@@ -1,19 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Info, Shield, ToggleRight, Target } from "lucide-react";
-import { useEffect, useRef } from "react";
-import katex from "katex";
-import "katex/dist/katex.min.css";
-
-function KaTeX({ math, display = false }: { math: string; display?: boolean }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    if (ref.current) {
-      katex.render(math, ref.current, { displayMode: display, throwOnError: false });
-    }
-  }, [math, display]);
-  return <span ref={ref} />;
-}
 
 const steps = [
   {
@@ -37,7 +24,7 @@ const legendItems = [
   { symbol: "WS/48", desc: "Win Shares per 48 minutes — an advanced efficiency metric capturing a player's overall contribution per minute played." },
   { symbol: "Age", desc: "The age modifier (35 − Age) penalizes older players, weighting younger talent with more remaining prime years." },
   { symbol: "AAV", desc: "Average Annual Value of the player's contract. The logarithmic denominator discounts high-salary players, rewarding cost efficiency." },
-  { symbol: "W_{pos}", desc: "Positional scarcity weight — adjusts value based on how rare elite production is at each position (e.g., centers vs. guards)." },
+  { symbol: "Wₚₒₛ", desc: "Positional scarcity weight — adjusts value based on how rare elite production is at each position (e.g., centers vs. guards)." },
 ];
 
 export function MethodologyModal() {
@@ -73,17 +60,31 @@ export function MethodologyModal() {
             </div>
           </section>
 
-          {/* AI Score Formula */}
+          {/* PSV Formula */}
           <section className="space-y-4">
             <h3 className="font-mono text-xs uppercase tracking-widest text-accent font-semibold">Projected Surplus Value (PSV) Breakdown</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
               Each player's PSV (1–100) is computed using a composite formula that balances on-court efficiency, age trajectory, contract value, and positional scarcity:
             </p>
-            <div className="flex flex-col items-center gap-4 py-5 px-6 rounded-lg bg-secondary/60 border border-border/50">
-              <KaTeX
-                math="\\text{Score} = \\dfrac{\\text{WS/48} \\;\\times\\; (35 - \\text{Age})}{\\ln(\\text{AAV} + 1)} \\;\\times\\; W_{\\text{pos}}"
-                display
-              />
+            <div className="flex flex-col items-center gap-2 py-5 px-6 rounded-lg bg-secondary/60 border border-border/50">
+              <div className="text-center font-mono text-sm leading-loose">
+                <span className="text-foreground font-semibold">PSV</span>
+                <span className="text-muted-foreground mx-2">=</span>
+                <span className="inline-flex flex-col items-center mx-1 align-middle">
+                  <span className="border-b border-muted-foreground/40 px-3 pb-1">
+                    <span className="text-accent">WS/48</span>
+                    <span className="text-muted-foreground mx-1">×</span>
+                    <span className="text-foreground">(35 − Age)</span>
+                  </span>
+                  <span className="pt-1">
+                    <span className="text-muted-foreground">ln(</span>
+                    <span className="text-accent">AAV</span>
+                    <span className="text-muted-foreground"> + 1)</span>
+                  </span>
+                </span>
+                <span className="text-muted-foreground mx-2">×</span>
+                <span className="text-foreground italic">W<sub>pos</sub></span>
+              </div>
             </div>
           </section>
 
@@ -93,9 +94,9 @@ export function MethodologyModal() {
             <div className="space-y-2">
               {legendItems.map((item) => (
                 <div key={item.symbol} className="flex gap-3 items-start text-xs">
-                  <div className="shrink-0 w-16 text-right pt-0.5">
-                    <KaTeX math={item.symbol} />
-                  </div>
+                  <span className="shrink-0 w-16 text-right font-mono text-accent font-semibold pt-0.5">
+                    {item.symbol}
+                  </span>
                   <span className="text-muted-foreground leading-relaxed">{item.desc}</span>
                 </div>
               ))}
