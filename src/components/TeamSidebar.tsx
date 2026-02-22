@@ -88,7 +88,7 @@ export function TeamSidebar({
   return (
     <div
       className={cn(
-        "flex flex-col h-screen border-r border-border bg-sidebar shrink-0 transition-all duration-200",
+        "flex flex-col h-full border-r border-border bg-sidebar shrink-0 transition-all duration-200",
         collapsed ? "w-16" : "w-60"
       )}
     >
