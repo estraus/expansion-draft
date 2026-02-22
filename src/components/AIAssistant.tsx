@@ -1,33 +1,74 @@
 import { useState } from "react";
-import { TeamData, ChatMessage, getMockResponse } from "@/data/teams";
+import { TeamData, ChatMessage, getMockResponse, teamData } from "@/data/teams";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, Send, Sparkles } from "lucide-react";
+import { Bot, Send, Sparkles, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AppMode } from "@/components/TeamSidebar";
 
 interface AIAssistantProps {
   team: TeamData | null;
+  mode: AppMode;
+  expansionTeamId: string;
+  draftedPlayers: Record<string, { playerId: string; fromTeamId: string }[]>;
+  protectedPlayers: Record<string, Set<string>>;
 }
 
-export function AIAssistant({ team }: AIAssistantProps) {
+const expansionNames: Record<string, string> = {
+  sea: "Seattle Supersonics",
+  lvn: "Las Vegas Aces",
+};
+
+function buildDraftRecommendation(
+  expansionTeamId: string,
+  protectedPlayers: Record<string, Set<string>>,
+  draftedPlayers: Record<string, { playerId: string; fromTeamId: string }[]>
+): string {
+  const allDraftedIds = new Set<string>();
+  for (const picks of Object.values(draftedPlayers)) {
+    for (const pick of picks) allDraftedIds.add(pick.playerId);
+  }
+
+  type PoolPlayer = { name: string; aiScore: number; position: string; contractValue: number; teamAbbr: string };
+  const pool: PoolPlayer[] = [];
+  for (const [tid, team] of Object.entries(teamData)) {
+    const protSet = protectedPlayers[tid] || new Set<string>();
+    for (const p of team.players) {
+      if (!protSet.has(p.id) && !allDraftedIds.has(p.id)) {
+        pool.push({ name: p.name, aiScore: p.aiScore, position: p.position, contractValue: p.contractValue, teamAbbr: team.abbreviation });
+      }
+    }
+  }
+
+  const sorted = pool.sort((a, b) => b.aiScore - a.aiScore).slice(0, 10);
+  const teamName = expansionNames[expansionTeamId] || "Expansion Team";
+  let rec = `**Draft Recommendations — ${teamName}**\n\nTop available players by AI Score:\n\n`;
+  sorted.forEach((p, i) => {
+    rec += `${i + 1}. **${p.name}** (${p.teamAbbr}) — ${p.position}, Score: ${p.aiScore}, $${(p.contractValue / 1e6).toFixed(1)}M\n`;
+  });
+  rec += `\n*Focus on high-score players with team-friendly contracts. Balance positional needs across your 15-man roster.*`;
+  return rec;
+}
+
+export function AIAssistant({ team, mode, expansionTeamId, draftedPlayers, protectedPlayers }: AIAssistantProps) {
   const [chatHistories, setChatHistories] = useState<Record<string, ChatMessage[]>>({});
   const [input, setInput] = useState("");
 
-  const teamId = team?.id || "";
-  const messages = chatHistories[teamId] || [];
+  const chatKey = mode === "protection" ? (team?.id || "") : `draft-${expansionTeamId}`;
+  const messages = chatHistories[chatKey] || [];
 
   const handleSend = () => {
-    if (!input.trim() || !teamId) return;
+    if (!input.trim() || !chatKey) return;
     const userMsg: ChatMessage = { role: "user", content: input.trim() };
-    const assistantMsg: ChatMessage = { role: "assistant", content: getMockResponse(teamId, input) };
+    const assistantMsg: ChatMessage = { role: "assistant", content: getMockResponse(chatKey, input) };
     setChatHistories((prev) => ({
       ...prev,
-      [teamId]: [...(prev[teamId] || []), userMsg, assistantMsg],
+      [chatKey]: [...(prev[chatKey] || []), userMsg, assistantMsg],
     }));
     setInput("");
   };
 
-  if (!team) {
+  if (mode === "protection" && !team) {
     return (
       <div className="w-80 border-l border-border bg-card flex items-center justify-center shrink-0">
         <p className="text-muted-foreground text-sm font-mono px-4 text-center">
@@ -37,11 +78,17 @@ export function AIAssistant({ team }: AIAssistantProps) {
     );
   }
 
+  const recommendation = mode === "protection"
+    ? team!.aiRecommendation
+    : buildDraftRecommendation(expansionTeamId, protectedPlayers, draftedPlayers);
+
+  const recTitle = mode === "protection" ? "Recommended Protections" : "Draft Recommendations";
+
   return (
     <div className="w-80 border-l border-border bg-card flex flex-col shrink-0">
       {/* Header */}
       <div className="p-3 border-b border-border flex items-center gap-2">
-        <Bot className="h-4 w-4 text-accent" />
+        {mode === "draft" ? <Target className="h-4 w-4 text-accent" /> : <Bot className="h-4 w-4 text-accent" />}
         <h3 className="font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           AI GM Assistant
         </h3>
@@ -54,11 +101,11 @@ export function AIAssistant({ team }: AIAssistantProps) {
             <div className="flex items-center gap-1.5">
               <Sparkles className="h-3.5 w-3.5 text-accent" />
               <span className="text-xs font-mono uppercase tracking-wider text-accent font-semibold">
-                Recommended Protections
+                {recTitle}
               </span>
             </div>
             <div className="text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap font-mono">
-              {team.aiRecommendation}
+              {recommendation}
             </div>
           </div>
 
@@ -97,7 +144,7 @@ export function AIAssistant({ team }: AIAssistantProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Ask about this roster..."
+            placeholder={mode === "protection" ? "Ask about this roster..." : "Ask about the draft pool..."}
             className="flex-1 bg-secondary text-sm rounded px-3 py-2 text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-1 focus:ring-primary font-mono text-xs"
           />
           <Button size="icon" variant="ghost" onClick={handleSend} disabled={!input.trim()}>
