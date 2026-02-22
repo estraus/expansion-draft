@@ -6,6 +6,7 @@ import { Bot, Send, Sparkles, Target, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AppMode } from "@/components/TeamSidebar";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 
 interface AIAssistantProps {
   team: TeamData | null;
@@ -270,8 +271,8 @@ export function AIAssistant({ team, mode, expansionTeamId, draftedPlayers, prote
                 {recTitle}
               </span>
             </div>
-            <div className="text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap font-mono">
-              {recommendation}
+            <div className="text-xs leading-relaxed text-muted-foreground font-mono prose prose-invert prose-xs max-w-none [&_strong]:text-foreground [&_em]:text-muted-foreground/80 [&_p]:m-0 [&_ul]:m-0 [&_ol]:m-0 [&_li]:m-0">
+              <ReactMarkdown>{recommendation}</ReactMarkdown>
             </div>
           </div>
 
@@ -294,7 +295,9 @@ export function AIAssistant({ team, mode, expansionTeamId, draftedPlayers, prote
                   <span className="font-mono text-[10px] uppercase tracking-wider block mb-1 opacity-60">
                     {msg.role === "user" ? "You" : "AI GM"}
                   </span>
-                  <span className="whitespace-pre-wrap">{msg.content}</span>
+                  <div className="prose prose-invert prose-xs max-w-none [&_strong]:text-foreground [&_em]:text-muted-foreground/80 [&_p]:m-0 [&_ul]:m-0 [&_ol]:m-0 [&_li]:m-0">
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  </div>
                 </div>
               ))}
             </div>
