@@ -79,9 +79,9 @@ export function MethodologyModal() {
             <p className="text-xs text-muted-foreground leading-relaxed">
               Each player's AI Value Score (1–100) is computed using a composite formula that balances on-court efficiency, age trajectory, contract value, and positional scarcity:
             </p>
-            <div className="flex justify-center py-4 px-6 rounded-lg bg-secondary/60 border border-border/50">
+            <div className="flex flex-col items-center gap-4 py-5 px-6 rounded-lg bg-secondary/60 border border-border/50">
               <KaTeX
-                math="Score = \\left( \\frac{WS/48 \\times (35 - Age)}{\\log(AAV + 1)} \\right) \\times W_{pos}"
+                math="\\text{Score} = \\dfrac{\\text{WS/48} \\;\\times\\; (35 - \\text{Age})}{\\ln(\\text{AAV} + 1)} \\;\\times\\; W_{\\text{pos}}"
                 display
               />
             </div>
