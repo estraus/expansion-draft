@@ -1,73 +1,40 @@
-# Welcome to your Lovable project
+# NBA Expansion Draft Simulator & AI Assistant
 
-## Project info
+## Overview
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+This project is a high-fidelity, minimum viable AI product (MVP) built to help NBA front offices simulate roster protection scenarios and execute strategic planning for an upcoming league expansion (e.g., Seattle and Las Vegas). 
 
-## How can I edit this code?
+Designed with a dark-mode, analytics-grade aesthetic, the dashboard bridges the gap between complex basketball operations data and actionable executive decision-making. It integrates conceptual machine learning models (predicting asset value) and generative AI (summarizing insights and acting as a GM assistant).
 
-There are several ways of editing your application.
+## Key Features
 
-**Use Lovable**
+* **Dual-Mode Simulation Engine:**
+    * **Protection Mode:** Navigate through all 30 NBA franchises and toggle up to 8 "Protected" players per team to shield them from the expansion draft.
+    * **Expansion Draft Mode:** Switch to the Seattle or Las Vegas front offices to draft a 15-man roster from the remaining pool of unprotected players across the league.
+* **Explainable AI & Predictive ML (PSV):**
+    * Instead of a black-box rating, the tool introduces **Projected Surplus Value (PSV)**, a metric evaluating a player's on-court efficiency against their age trajectory and contract AAV.
+    * Features an "AI Methodology" modal to provide complete transparency into the math driving the forecasting.
+    * Includes "Scouting TL;DR" tooltips simulating batch-processed LLM summaries of unstructured scouting reports.
+* **Generative AI GM Assistant:**
+    * A built-in chat interface that ingests the active, live state of the drafted rosters as context.
+    * Simulates a Retrieval-Augmented Generation (RAG) workflow to answer complex, cap-compliant queries (e.g., "Build the best 5-man roster while spending under $100M").
+* **Data Governance & Operational Workflows:**
+    * **Export to CSV:** Download official protection lists with a single click to support front-office workflows.
+    * **State Management:** Save and load different forecasting scenarios locally to compare strategic models.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## Technical Stack & Lovable Info
 
-**Use your preferred IDE**
+**URL**: https://expansion-draft.lovable.app
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
+### What technologies are used for this project?
 
 This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+* Vite
+* TypeScript
+* React
+* shadcn-ui
+* Tailwind CSS
+* *(Designed for future integration with Python/scikit-learn backends and OpenAI/Gemini LLM APIs)*
