@@ -1,3 +1,8 @@
+export interface FeatureWeight {
+  feature: string;
+  impact: number;
+}
+
 export interface Player {
   id: string;
   name: string;
@@ -5,6 +10,7 @@ export interface Player {
   position: string;
   contractValue: number;
   aiScore: number;
+  mlFeatureWeights: FeatureWeight[];
 }
 
 export interface TeamData {
@@ -80,14 +86,49 @@ function genRec(teamName: string, players: Player[]): string {
   return rec;
 }
 
+// Deterministic seeded random for consistent feature weights
+function seededRandom(seed: number): () => number {
+  let s = seed;
+  return () => { s = (s * 16807 + 0) % 2147483647; return s / 2147483647; };
+}
+
+function generateFeatureWeights(name: string, age: number, contractValue: number, aiScore: number, position: string): FeatureWeight[] {
+  const seed = name.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  const rng = seededRandom(seed);
+
+  const ageFactor = age <= 25 ? Math.round((25 - age) * 1.5 + rng() * 4) : -Math.round((age - 25) * 1.8 + rng() * 3);
+  const capHit = contractValue > 25_000_000 ? -Math.round((contractValue / 1e6 - 25) * 0.4 + rng() * 3) : Math.round((25 - contractValue / 1e6) * 0.3 + rng() * 2);
+  const ts = Math.round((aiScore - 50) * 0.35 + (rng() - 0.5) * 8);
+  const usage = Math.round((rng() - 0.4) * 14);
+  const defense = position === "C" || position === "PF" ? Math.round(rng() * 12 - 2) : Math.round(rng() * 10 - 4);
+  const durability = age > 30 ? -Math.round(rng() * 8 + 2) : Math.round(rng() * 6);
+  const winShares = Math.round((aiScore - 55) * 0.25 + (rng() - 0.3) * 6);
+  const playoffXp = age > 27 ? Math.round(rng() * 8) : -Math.round(rng() * 4);
+
+  return [
+    { feature: "Age Decline Curve", impact: ageFactor },
+    { feature: "True Shooting %", impact: ts },
+    { feature: "Cap Hit Efficiency", impact: capHit },
+    { feature: "Usage Rate", impact: usage },
+    { feature: "Defensive Rating", impact: defense },
+    { feature: "Win Shares / 48", impact: winShares },
+    { feature: "Durability Index", impact: durability },
+    { feature: "Playoff Experience", impact: playoffXp },
+  ].sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
+}
+
 function makeTeam(
   id: string,
   name: string,
   abbr: string,
   conf: "Eastern" | "Western",
-  players: Omit<Player, "id">[]
+  players: Omit<Player, "id" | "mlFeatureWeights">[]
 ): TeamData {
-  const fullPlayers = players.map((p, i) => ({ ...p, id: `${id}-${i + 1}` }));
+  const fullPlayers = players.map((p, i) => ({
+    ...p,
+    id: `${id}-${i + 1}`,
+    mlFeatureWeights: generateFeatureWeights(p.name, p.age, p.contractValue, p.aiScore, p.position),
+  }));
   return {
     id,
     name,

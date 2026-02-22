@@ -2,6 +2,8 @@ import { Player, TeamData, teamData } from "@/data/teams";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ScoreTooltip } from "@/components/ScoreTooltip";
 import { cn } from "@/lib/utils";
 import { ArrowUpDown, Target, UserCheck } from "lucide-react";
 import { useState } from "react";
@@ -180,9 +182,20 @@ export function DraftPoolTable({ expansionTeamId, protectedPlayers, draftedPlaye
                 </td>
                 <td className="p-3 text-right font-mono text-sm">{formatCurrency(player.contractValue)}</td>
                 <td className="p-3 text-center">
-                  <Badge className={cn("font-mono text-xs border", getScoreColor(player.aiScore))}>
-                    {player.aiScore}
-                  </Badge>
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="cursor-help">
+                          <Badge className={cn("font-mono text-xs border", getScoreColor(player.aiScore))}>
+                            {player.aiScore}
+                          </Badge>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" className="p-0 bg-card border-border shadow-xl z-50" sideOffset={8}>
+                        <ScoreTooltip score={player.aiScore} weights={player.mlFeatureWeights} />
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </td>
                 <td className="p-3 text-center">
                   <Button
