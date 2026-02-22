@@ -30,7 +30,7 @@ function getScoreColor(score: number): string {
 
 const expansionTeams: Record<string, string> = {
   sea: "Seattle Supersonics",
-  lvn: "Las Vegas Aces",
+  lvn: "Las Vegas Spades",
 };
 
 function RosterSynergyBar({ draftedCount }: { draftedCount: number }) {
