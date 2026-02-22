@@ -1,0 +1,4 @@
+project_id = "nzqaimeckpjuaoxxppds"
+
+[functions.gm-chat]
+verify_jwt = false
